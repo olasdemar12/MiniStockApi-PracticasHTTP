@@ -13,4 +13,6 @@ app.MapGet("/saludo", HomeRoutes.GetSaludo);
 
 app.MapGet("/productos", Products.getProducts);
 
+app.MapGet("/productos/{id}", Products.getProductById);
+
 app.Run();
