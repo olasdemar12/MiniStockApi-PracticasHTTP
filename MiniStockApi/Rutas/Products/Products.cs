@@ -27,9 +27,34 @@ namespace MiniStockApi.Rutas.Products
             Stock = stock;
         }
 
-        public static IResult getProducts()
+        public static IResult getProducts(string? categoria, int? stockMinimo)
         {
-            var inforMationProducts = new { NameObject = "Productos encontrados", CountList = productos.Count, items = productos };
+            var query = productos.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(categoria))
+            {
+                query = query.Where(p =>
+                    p.Categoria.Equals(categoria, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (stockMinimo.HasValue)
+            {
+                query = query.Where(p => p.Stock >= stockMinimo.Value);
+            }
+
+            var productosFiltrados = query.ToList();
+
+            var inforMationProducts = new
+            {
+                NameObject = "Productos encontrados",
+                CountList = productosFiltrados.Count,
+                Filters = new
+                {
+                    Categoria = categoria,
+                    StockMinimo = stockMinimo
+                },
+                items = productosFiltrados
+            };
 
             return Results.Ok(inforMationProducts);
         }
@@ -59,6 +84,28 @@ namespace MiniStockApi.Rutas.Products
             var inforMationProduct = new { NameObject = "Producto creado", item = newProduct };
 
             return Results.Created($"/products/{newId}", inforMationProduct);
+        }
+
+        public static IResult getProductStock(int id)
+        {
+            var product = productos.FirstOrDefault(p => p.Id == id);
+
+            if (product is null)
+            {
+                return Results.NotFound(new
+                {
+                    Message = $"Producto con Id {id} no encontrado"
+                });
+            }
+
+            var response = new
+            {
+                ProductId = product.Id,
+                ProductName = product.Nombre,
+                Stock = product.Stock
+            };
+
+            return Results.Ok(response);
         }
     }
 }
