@@ -107,5 +107,31 @@ namespace MiniStockApi.Rutas.Products
 
             return Results.Ok(response);
         }
+
+        public static IResult updateProduct(int id, UpdateProductRequest request)
+        {
+            var product = productos.FirstOrDefault(p => p.Id == id);
+
+            if (product is null)
+            {
+                return Results.NotFound(new
+                {
+                    Message = $"Producto con Id {id} no encontrado"
+                });
+            }
+
+            product.Nombre = request.Nombre;
+            product.Categoria = request.Categoria;
+            product.Precio = request.Precio;
+            product.Stock = request.Stock;
+
+            var response = new
+            {
+                Message = "Producto actualizado correctamente",
+                item = product
+            };
+
+            return Results.Ok(response);
+        }
     }
 }

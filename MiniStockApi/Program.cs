@@ -17,4 +17,6 @@ app.MapPost("/productos", Products.createProduct);
 
 app.MapGet("/productos/{id}/stock", Products.getProductStock);
 
+app.MapPut("/productos/{id}", Products.updateProduct);
+
 app.Run();
